@@ -388,8 +388,11 @@ function pronosticFormHTML(p = {}) {
       }
     </div>
     <div class="form-group">
-      <label class="form-label">Temps prévu</label>
-      <input class="form-input" id="f-temps" type="text" placeholder="Ex: 1 juillet 2026" value="${escHtml(p.temps||'')}" />
+      <label class="form-label">Nombre de tours prévu</label>
+      <select class="form-select" id="f-temps">
+        <option value="">-- Choisir un nombre de tours --</option>
+        ${Array.from({length: 100}, (_, i) => i + 1).map(n => `<option value="${n} tour${n > 1 ? 's' : ''}" ${p.temps === `${n} tour${n > 1 ? 's' : ''}`?'selected':''}>${n} tour${n > 1 ? 's' : ''}</option>`).join('')}
+      </select>
     </div>`;
 }
 
