@@ -792,4 +792,12 @@ function deleteClassementCoureur(id) {
 }
 
 // ── Init ──
+SB.get('pronostics').then(data => {
+  remotePronostics = data;
+  DB.pronostics = data.map(p => ({ id: p.id, participant: p.participant, coureur: p.coureur, temps: p.temps || '' }));
+  if (currentPage === 'classement-prono') renderClassementProno();
+}).catch(() => {
+  remotePronostics = DB.pronostics;
+});
+
 navigate('coureurs');
