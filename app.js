@@ -342,13 +342,17 @@ function renderPronosticsList() {
 }
 
 function pronosticFormHTML(p = {}) {
-  const coureurOptions = DB.coureurs
-    .filter(c => c.statut === 'active')
-    .map(c => `<option value="${escHtml(c.nom)}" ${p.coureur===c.nom?'selected':''}>${escHtml(c.nom)}</option>`)
-    .join('');
+  const actifs = DB.coureurs.filter(c => c.statut === 'active');
+  const inactifs = DB.coureurs.filter(c => c.statut !== 'active');
+  const coureurOptions = [
+    ...actifs.map(c => `<option value="${escHtml(c.nom)}" ${p.coureur===c.nom?'selected':''}>${escHtml(c.nom)}</option>`),
+    ...(inactifs.length ? [`<option disabled>── Inactifs ──</option>`] : []),
+    ...inactifs.map(c => `<option value="${escHtml(c.nom)}" ${p.coureur===c.nom?'selected':''} style="color:#aaa">${escHtml(c.nom)} (inactif)</option>`),
+  ].join('');
   const participantOptions = DB.participants
     .map(pt => `<option value="${escHtml(pt.nom)}" ${p.participant===pt.nom?'selected':''}>${escHtml(pt.nom)}</option>`)
     .join('');
+  const noCoureurs = DB.coureurs.length === 0;
   return `
     <div class="form-group">
       <label class="form-label">Participant</label>
@@ -360,10 +364,13 @@ function pronosticFormHTML(p = {}) {
     </div>
     <div class="form-group">
       <label class="form-label">Coureur choisi</label>
-      <select class="form-select" id="f-coureur">
-        <option value="">-- Choisir --</option>
-        ${coureurOptions}
-      </select>
+      ${noCoureurs
+        ? `<div style="background:var(--gray-input);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--text-muted)">Aucun coureur disponible — ajoutez d'abord des coureurs.</div>`
+        : `<select class="form-select" id="f-coureur">
+            <option value="">-- Choisir parmi les coureurs --</option>
+            ${coureurOptions}
+          </select>`
+      }
     </div>
     <div class="form-group">
       <label class="form-label">Temps prévu</label>
@@ -375,8 +382,9 @@ function openAddPronostic() {
   openModal('Ajouter un pronostic', pronosticFormHTML(), () => {
     const selectVal = document.getElementById('f-participant').value;
     const customVal = document.getElementById('f-participant-custom').value.trim();
-    const participant = customVal || selectVal;
-    const coureur = document.getElementById('f-coureur').value;
+    const participant = selectVal || customVal;
+    const coureurEl = document.getElementById('f-coureur');
+    const coureur = coureurEl ? coureurEl.value : '';
     const temps = document.getElementById('f-temps').value.trim();
     if (!participant) { showToast('Le participant est requis'); return; }
     if (!coureur) { showToast('Le coureur choisi est requis'); return; }
@@ -394,8 +402,9 @@ function openEditPronostic(id) {
   openModal('Modifier le pronostic', pronosticFormHTML(p), () => {
     const selectVal = document.getElementById('f-participant').value;
     const customVal = document.getElementById('f-participant-custom').value.trim();
-    const participant = customVal || selectVal;
-    const coureur = document.getElementById('f-coureur').value;
+    const participant = selectVal || customVal;
+    const coureurEl = document.getElementById('f-coureur');
+    const coureur = coureurEl ? coureurEl.value : p.coureur;
     const temps = document.getElementById('f-temps').value.trim();
     if (!participant) { showToast('Le participant est requis'); return; }
     if (!coureur) { showToast('Le coureur choisi est requis'); return; }
