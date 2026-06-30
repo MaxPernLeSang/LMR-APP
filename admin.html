@@ -122,7 +122,7 @@
       overflow: hidden;
     }
 
-    /* Sidebar */
+    /* ── Desktop: sidebar ── */
     .admin-sidebar {
       width: 220px;
       flex-shrink: 0;
@@ -132,34 +132,50 @@
       flex-direction: column;
       padding: 28px 0 20px;
     }
-    @media (max-width: 600px) {
+    .admin-sidebar-logo { font-size: 22px; font-weight: 800; color: var(--pink); padding: 0 22px 6px; }
+    .admin-sidebar-sub { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); padding: 0 22px 20px; }
+
+    /* ── Mobile: bottom nav ── */
+    @media (max-width: 700px) {
+      #admin-app { flex-direction: column; }
+
       .admin-sidebar {
-        width: 160px;
-        padding: 16px 0 12px;
+        width: 100%;
+        height: 60px;
+        flex-direction: row;
+        padding: 0;
+        border-right: none;
+        border-top: 1px solid var(--gray-border);
+        order: 2;
+        flex-shrink: 0;
+        overflow: hidden;
       }
-      .admin-sidebar-logo { font-size: 17px; padding: 0 12px 4px; }
-      .admin-sidebar-sub { font-size: 9px; padding: 0 12px 14px; }
-      .admin-nav-btn { font-size: 12px; padding: 10px 10px; gap: 8px; margin: 0 4px; }
-      .admin-nav-btn svg { width: 15px; height: 15px; }
-      .admin-nav-btn span { display: none; }
+      .admin-sidebar-logo { display: none; }
+      .admin-sidebar-sub { display: none; }
+      .admin-sidebar-spacer { display: none; }
+      .admin-sidebar-footer { display: none; }
+
+      .admin-nav-btn {
+        flex: 1;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        font-size: 10px;
+        font-weight: 500;
+        padding: 6px 2px;
+        border-radius: 0;
+        margin: 0;
+        height: 100%;
+      }
+      .admin-nav-btn svg { width: 22px; height: 22px; }
+      .admin-nav-btn.active { background: none; color: var(--pink); font-weight: 600; }
+
+      .admin-main { order: 1; flex: 1; overflow: hidden; }
       .admin-page-header { padding: 16px 16px 10px; }
-      .admin-page-header h1 { font-size: 20px; }
+      .admin-page-header h1 { font-size: 22px; }
       .admin-section { margin: 0 12px 16px; }
       .classement-table th, .classement-table td { padding: 8px 10px; font-size: 12px; }
-    }
-    .admin-sidebar-logo {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--pink);
-      padding: 0 22px 6px;
-    }
-    .admin-sidebar-sub {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--text-muted);
-      padding: 0 22px 20px;
     }
     .admin-nav-btn {
       display: flex;
@@ -1123,8 +1139,8 @@ function renderAdminCoureurs() {
   tbody.innerHTML = DB.coureurs.map(c => {
     const elimTour = c.eliminatedAt ? computeTourAt(new Date(c.eliminatedAt)) : null;
     const elimLabel = c.eliminatedAt
-      ? `<span style="color:#e53935;font-size:12px;font-weight:600">❌ Tour ${elimTour} (${new Date(c.eliminatedAt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})})</span>`
-      : `<span style="color:#4caf50;font-size:12px;font-weight:600">✅ En course</span>`;
+      ? `<span style="color:#e53935;font-size:12px;font-weight:600">Tour ${elimTour} — ${new Date(c.eliminatedAt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</span>`
+      : `<span style="color:#4caf50;font-size:12px;font-weight:600">En course</span>`;
     return `
     <tr>
       <td>${c.photo ? `<img src="${esc(c.photo)}" style="width:36px;height:36px;object-fit:cover;border-radius:8px">` : '<div style="width:36px;height:36px;background:var(--gray-input);border-radius:8px"></div>'}</td>

@@ -181,8 +181,8 @@ function renderRiderCards() {
     const start = new Date('2026-07-04T10:00:00');
     const elimTour = c.eliminatedAt ? Math.min(Math.floor((new Date(c.eliminatedAt) - start) / (1000*60*60)) + 1, 100) : null;
     const statusBadge = c.eliminatedAt
-      ? `<div class="rider-status-elim">❌ Éliminé — Tour ${elimTour}</div>`
-      : `<div class="rider-status-active">✅ En course</div>`;
+      ? `<div class="rider-status-elim">Éliminé — Tour ${elimTour}</div>`
+      : `<div class="rider-status-active">En course</div>`;
     return `
     <div class="rider-card${c.eliminatedAt ? ' rider-card-eliminated' : ''}">
       ${c.photo
