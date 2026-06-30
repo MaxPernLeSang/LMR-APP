@@ -718,7 +718,7 @@ body {
 
 /* ── Logos ── */
 .logo-lmr {
-  height: 32px;
+  height: 40px;
   width: auto;
   object-fit: contain;
   background: #1a1a1a;
@@ -726,10 +726,17 @@ body {
   padding: 3px 6px;
 }
 .logo-larosiere {
-  height: 32px;
-  width: 32px;
+  height: 40px;
+  width: 40px;
   object-fit: cover;
   border-radius: 6px;
+}
+
+.logo-cross {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-muted);
+  line-height: 1;
 }
 
 /* ── Mobile logo header ── */
@@ -743,7 +750,7 @@ body {
   border-bottom: 1px solid var(--gray-border);
   flex-shrink: 0;
   order: 0;
-  height: 52px;
+  height: 60px;
 }
 @media (min-width: 960px) {
   .mobile-logo-header { display: none; }
