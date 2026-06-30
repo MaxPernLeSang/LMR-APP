@@ -371,18 +371,11 @@ function pronosticFormHTML(p = {}) {
     ...(inactifs.length ? [`<option disabled>── Inactifs ──</option>`] : []),
     ...inactifs.map(c => `<option value="${escHtml(c.nom)}" ${p.coureur===c.nom?'selected':''} style="color:#aaa">${escHtml(c.nom)} (inactif)</option>`),
   ].join('');
-  const participantOptions = DB.participants
-    .map(pt => `<option value="${escHtml(pt.nom)}" ${p.participant===pt.nom?'selected':''}>${escHtml(pt.nom)}</option>`)
-    .join('');
   const noCoureurs = DB.coureurs.length === 0;
   return `
     <div class="form-group">
-      <label class="form-label">Participant</label>
-      <select class="form-select" id="f-participant">
-        <option value="">-- Choisir --</option>
-        ${participantOptions}
-      </select>
-      <input class="form-input" id="f-participant-custom" type="text" placeholder="Ou saisir manuellement..." value="${!DB.participants.find(x=>x.nom===p.participant)&&p.participant?escHtml(p.participant):''}" style="margin-top:6px"/>
+      <label class="form-label">Ton prénom / nom</label>
+      <input class="form-input" id="f-participant" type="text" placeholder="Ex: Jean Dupont" value="${escHtml(p.participant||'')}" />
     </div>
     <div class="form-group">
       <label class="form-label">Coureur choisi</label>
@@ -402,7 +395,7 @@ function pronosticFormHTML(p = {}) {
 
 
 const COOLDOWN_KEY = 'lmr_prono_last';
-const COOLDOWN_MS = 2 * 60 * 60 * 1000;
+const COOLDOWN_MS = 12 * 60 * 60 * 1000;
 
 function getCooldownRemaining() {
   const last = parseInt(localStorage.getItem(COOLDOWN_KEY) || '0');
@@ -426,15 +419,15 @@ function openAddPronostic() {
     return;
   }
   openModal('Ajouter un pronostic', pronosticFormHTML(), () => {
-    const selectVal = document.getElementById('f-participant').value;
-    const customVal = document.getElementById('f-participant-custom').value.trim();
-    const participant = selectVal || customVal;
+    const participant = document.getElementById('f-participant').value.trim();
     const coureurEl = document.getElementById('f-coureur');
     const coureur = coureurEl ? coureurEl.value : '';
     const temps = document.getElementById('f-temps').value.trim();
     if (!participant) { showToast('Le participant est requis'); return; }
     if (containsBannedWord(participant)) { showToast('Nom invalide — langage inapproprié'); return; }
     if (!coureur) { showToast('Le coureur choisi est requis'); return; }
+    const already = remotePronostics.find(x => x.participant.toLowerCase() === participant.toLowerCase());
+    if (already) { showToast('Un pronostic existe déjà pour ce nom'); return; }
     closeModal();
     showToast('Enregistrement...');
     SB.insert('pronostics', { participant, coureur, temps }).then(() => {
@@ -449,9 +442,7 @@ function openEditPronostic(id) {
   const p = remotePronostics.find(x => x.id === id);
   if (!p) return;
   openModal('Modifier le pronostic', pronosticFormHTML(p), () => {
-    const selectVal = document.getElementById('f-participant').value;
-    const customVal = document.getElementById('f-participant-custom').value.trim();
-    const participant = selectVal || customVal;
+    const participant = document.getElementById('f-participant').value.trim();
     const coureurEl = document.getElementById('f-coureur');
     const coureur = coureurEl ? coureurEl.value : p.coureur;
     const temps = document.getElementById('f-temps').value.trim();
