@@ -1120,24 +1120,59 @@ function renderAdminCoureurs() {
     </div></td></tr>`;
     return;
   }
-  tbody.innerHTML = DB.coureurs.map(c => `
+  tbody.innerHTML = DB.coureurs.map(c => {
+    const elimTour = c.eliminatedAt ? computeTourAt(new Date(c.eliminatedAt)) : null;
+    const elimLabel = c.eliminatedAt
+      ? `<span style="color:#e53935;font-size:12px;font-weight:600">❌ Tour ${elimTour} (${new Date(c.eliminatedAt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})})</span>`
+      : `<span style="color:#4caf50;font-size:12px;font-weight:600">✅ En course</span>`;
+    return `
     <tr>
-      <td>${c.photo ? `<img src="${esc(c.photo)}" style="width:40px;height:40px;object-fit:cover;border-radius:8px">` : '<div style="width:40px;height:40px;background:var(--gray-input);border-radius:8px"></div>'}</td>
+      <td>${c.photo ? `<img src="${esc(c.photo)}" style="width:36px;height:36px;object-fit:cover;border-radius:8px">` : '<div style="width:36px;height:36px;background:var(--gray-input);border-radius:8px"></div>'}</td>
       <td class="td-name">${esc(c.nom)}</td>
-      <td><input class="inline-input" type="number" step="0.01" value="${c.cote||0}" style="width:80px" onchange="updateCoureurField(${c.id},'cote',parseFloat(this.value)||0)" /></td>
-      <td><input class="inline-input" type="number" step="0.01" value="${c.rang||0}" style="width:80px" onchange="updateCoureurField(${c.id},'rang',parseFloat(this.value)||0)" /></td>
-      <td>
-        <select style="background:var(--gray-input);border:none;border-radius:8px;padding:6px 8px;font-size:13px" onchange="updateCoureurField(${c.id},'statut',this.value)">
-          <option value="active" ${c.statut==='active'?'selected':''}>Actif</option>
-          <option value="inactive" ${c.statut!=='active'?'selected':''}>Inactif</option>
-        </select>
-      </td>
-      <td class="td-actions">
+      <td>${elimLabel}</td>
+      <td class="td-actions" style="white-space:nowrap">
+        ${c.eliminatedAt
+          ? `<button class="icon-btn" title="Remettre en course" onclick="reinstaterCoureur(${c.id})" style="color:#4caf50">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+             </button>`
+          : `<button class="icon-btn" title="Marquer éliminé maintenant" onclick="eliminerCoureur(${c.id})" style="color:#e53935">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+             </button>`
+        }
         <button class="icon-btn delete" title="Supprimer" onclick="deleteAdminCoureur(${c.id})">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
         </button>
       </td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
+}
+
+function computeTourAt(date) {
+  const start = new Date('2026-07-04T10:00:00');
+  if (date < start) return 0;
+  return Math.min(Math.floor((date - start) / (1000 * 60 * 60)) + 1, 100);
+}
+
+function eliminerCoureur(id) {
+  const c = DB.coureurs.find(x => x.id === id);
+  if (!c) return;
+  confirmDelete(`Marquer "${c.nom}" comme éliminé maintenant ?`, () => {
+    c.eliminatedAt = new Date().toISOString();
+    c.statut = 'inactive';
+    DB.save();
+    renderAdminCoureurs();
+    showToast(`${c.nom} éliminé — Tour ${computeTourAt(new Date(c.eliminatedAt))}`);
+  });
+}
+
+function reinstaterCoureur(id) {
+  const c = DB.coureurs.find(x => x.id === id);
+  if (!c) return;
+  c.eliminatedAt = null;
+  c.statut = 'active';
+  DB.save();
+  renderAdminCoureurs();
+  showToast(`${c.nom} remis en course`);
 }
 
 function updateCoureurField(id, field, value) {

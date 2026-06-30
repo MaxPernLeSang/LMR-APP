@@ -181,6 +181,21 @@ body {
   font-size: 14px;
   color: var(--text-muted);
 }
+.rider-status-active {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4caf50;
+  margin-top: 3px;
+}
+.rider-status-elim {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e53935;
+  margin-top: 3px;
+}
+.rider-card-eliminated {
+  opacity: 0.6;
+}
 .rider-card-actions {
   position: absolute;
   top: 10px;

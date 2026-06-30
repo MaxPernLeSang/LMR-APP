@@ -177,16 +177,23 @@ function renderRiderCards() {
     return;
   }
 
-  container.innerHTML = filtered.map(c => `
-    <div class="rider-card">
+  container.innerHTML = filtered.map(c => {
+    const start = new Date('2026-07-04T10:00:00');
+    const elimTour = c.eliminatedAt ? Math.min(Math.floor((new Date(c.eliminatedAt) - start) / (1000*60*60)) + 1, 100) : null;
+    const statusBadge = c.eliminatedAt
+      ? `<div class="rider-status-elim">❌ Éliminé — Tour ${elimTour}</div>`
+      : `<div class="rider-status-active">✅ En course</div>`;
+    return `
+    <div class="rider-card${c.eliminatedAt ? ' rider-card-eliminated' : ''}">
       ${c.photo
         ? `<img class="rider-card-img" src="${escHtml(c.photo)}" alt="${escHtml(c.nom)}" />`
         : `<div class="rider-card-img-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><circle cx="12" cy="5" r="2"/><path d="M12 7c-2 0-4 1-5 3l-2 5h3l1 4h6l1-4h3l-2-5c-1-2-3-3-5-3z"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/></svg></div>`}
       <div class="rider-card-info">
         <div class="rider-card-name">${escHtml(c.nom)}</div>
-        <div class="rider-card-sub">${parseFloat(c.rang).toFixed(2)}</div>
+        ${statusBadge}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function coureurFormHTML(c = {}) {
