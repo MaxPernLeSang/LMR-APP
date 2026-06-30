@@ -344,10 +344,8 @@ body {
   padding: 12px 16px;
   border-bottom: 1px solid var(--gray-border);
   align-items: center;
-  cursor: pointer;
   transition: background 0.1s;
 }
-.prono-row:hover { background: #fafafa; }
 .prono-row:last-child { border-bottom: none; }
 .prono-cell { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .prono-cell.bold { font-weight: 700; font-size: 13px; }

@@ -376,7 +376,7 @@ function renderPronosticsList() {
         <span class="prono-group-count">${pronos.length} pronostic${pronos.length > 1 ? 's' : ''}</span>
       </div>
       ${pronos.map(p => `
-        <div class="prono-row" onclick="openEditPronostic('${escHtml(p.id)}')">
+        <div class="prono-row">
           <div class="prono-cell">${escHtml(p.coureur)}</div>
           <div class="prono-cell muted">${escHtml(p.temps || '')}</div>
         </div>`).join('')}
