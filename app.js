@@ -557,9 +557,6 @@ function renderPronoList() {
         <div class="ranking-name">${escHtml(s.nom)}</div>
         <div class="ranking-sub">${s.total.toFixed(2)} · ${s.count.toFixed(2)}</div>
       </div>
-      <div class="ranking-actions">
-        <button class="icon-btn delete" onclick="event.stopPropagation();deleteParticipant('${escHtml(s.nom)}')" title="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
-      </div>
       <div class="list-row-chevron">›</div>
     </div>`;
   }).join('');
