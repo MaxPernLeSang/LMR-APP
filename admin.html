@@ -1212,13 +1212,11 @@ function deleteAdminCoureur(id) {
 function openAdminAddCoureur() {
   const nom = prompt('Nom du coureur :');
   if (!nom || !nom.trim()) return;
-  const cote = parseFloat(prompt('Cote (ex: 100) :') || '0');
-  const rang = parseFloat(prompt('Rang (ex: 1) :') || '0');
   DB.coureurs.push({
     id: DB.nextId(DB.coureurs),
     nom: nom.trim(),
-    cote: isNaN(cote) ? 0 : cote,
-    rang: isNaN(rang) ? 0 : rang,
+    cote: 0,
+    rang: 0,
     statut: 'active',
     photo: ''
   });
