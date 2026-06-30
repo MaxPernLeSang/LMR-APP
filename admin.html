@@ -693,6 +693,7 @@
 </div>
 
 <script src="data.js"></script>
+<script src="config.js"></script>
 <script>
 // ── Password gate ──
 const ADMIN_PASSWORD = 'Larosiere';
@@ -1021,11 +1022,12 @@ function deletePronosticAdmin(id) {
   const p = DB.pronostics.find(x => x.id === id);
   if (!p) return;
   confirmDelete(`Supprimer le pronostic de "${p.participant}" ?`, () => {
-    DB.pronostics = DB.pronostics.filter(x => x.id !== id);
-    DB.save();
-    renderVotesPage();
-    renderDashboard();
-    showToast('Pronostic supprimé');
+    SB.delete('pronostics', id).then(() => {
+      DB.pronostics = DB.pronostics.filter(x => x.id !== id);
+      renderVotesPage();
+      renderDashboard();
+      showToast('Pronostic supprimé');
+    }).catch(() => showToast('Erreur lors de la suppression'));
   });
 }
 

@@ -289,6 +289,7 @@ function deleteCoureur(id) {
 // PAGE: PRONOSTICS
 // ─────────────────────────────────────────────
 let pronosticsSearch = '';
+let remotePronostics = [];
 
 function renderPronostics() {
   const page = document.getElementById('page-pronostics');
@@ -309,44 +310,56 @@ function renderPronostics() {
       </div>
     </div>
     <div class="content">
-      <div class="table-header">
+      <div class="table-header" id="pronostics-table-header" style="display:none">
         <span>PARTICIPANT</span>
         <span>COUREUR CHOISI</span>
         <span>TEMPS PRÉVU</span>
       </div>
-      <div id="pronostics-list"></div>
+      <div id="pronostics-list"><div class="empty-state"><div class="empty-state-sub" style="padding:40px">Chargement...</div></div></div>
     </div>`;
 
   document.getElementById('pronostics-search').addEventListener('input', e => {
     pronosticsSearch = e.target.value;
     renderPronosticsList();
   });
-  renderPronosticsList();
+
+  SB.get('pronostics').then(data => {
+    remotePronostics = data;
+    DB.pronostics = data.map(p => ({ id: p.id, participant: p.participant, coureur: p.coureur, temps: p.temps || '' }));
+    renderPronosticsList();
+  }).catch(() => {
+    showToast('Erreur de connexion — affichage local');
+    remotePronostics = DB.pronostics;
+    renderPronosticsList();
+  });
 }
 
 function renderPronosticsList() {
   const container = document.getElementById('pronostics-list');
   if (!container) return;
   const q = pronosticsSearch.toLowerCase();
-  const filtered = DB.pronostics.filter(p =>
+  const filtered = remotePronostics.filter(p =>
     p.participant.toLowerCase().includes(q) ||
     p.coureur.toLowerCase().includes(q)
   );
 
+  const header = document.getElementById('pronostics-table-header');
   if (!filtered.length) {
+    if (header) header.style.display = 'none';
     container.innerHTML = `<div class="empty-state">
       <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
       <div class="empty-state-text">Aucun pronostic</div>
-      <div class="empty-state-sub">Ajoutez des pronostics avec le bouton + Add</div>
+      <div class="empty-state-sub">Appuyez sur + Add pour voter</div>
     </div>`;
     return;
   }
+  if (header) header.style.display = 'grid';
 
   container.innerHTML = filtered.map(p => `
-    <div class="prono-row" onclick="openEditPronostic(${p.id})">
+    <div class="prono-row" onclick="openEditPronostic('${escHtml(p.id)}')">
       <div class="prono-cell bold">${escHtml(p.participant)}</div>
       <div class="prono-cell">${escHtml(p.coureur)}</div>
-      <div class="prono-cell muted">${escHtml(p.temps)}</div>
+      <div class="prono-cell muted">${escHtml(p.temps || '')}</div>
     </div>`).join('');
 }
 
@@ -387,7 +400,31 @@ function pronosticFormHTML(p = {}) {
     </div>`;
 }
 
+
+const COOLDOWN_KEY = 'lmr_prono_last';
+const COOLDOWN_MS = 2 * 60 * 60 * 1000;
+
+function getCooldownRemaining() {
+  const last = parseInt(localStorage.getItem(COOLDOWN_KEY) || '0');
+  return Math.max(0, COOLDOWN_MS - (Date.now() - last));
+}
+
+function formatCooldown(ms) {
+  const totalSec = Math.ceil(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (h > 0) return h + 'h ' + m + 'm';
+  if (m > 0) return m + 'm ' + s + 's';
+  return s + 's';
+}
+
 function openAddPronostic() {
+  const remaining = getCooldownRemaining();
+  if (remaining > 0) {
+    showToast('Attends encore ' + formatCooldown(remaining) + ' avant de voter à nouveau');
+    return;
+  }
   openModal('Ajouter un pronostic', pronosticFormHTML(), () => {
     const selectVal = document.getElementById('f-participant').value;
     const customVal = document.getElementById('f-participant-custom').value.trim();
@@ -398,16 +435,18 @@ function openAddPronostic() {
     if (!participant) { showToast('Le participant est requis'); return; }
     if (containsBannedWord(participant)) { showToast('Nom invalide — langage inapproprié'); return; }
     if (!coureur) { showToast('Le coureur choisi est requis'); return; }
-    DB.pronostics.push({ id: DB.nextId(DB.pronostics), participant, coureur, temps });
-    DB.save();
     closeModal();
-    renderPronosticsList();
-    showToast('Pronostic ajouté');
+    showToast('Enregistrement...');
+    SB.insert('pronostics', { participant, coureur, temps }).then(() => {
+      localStorage.setItem(COOLDOWN_KEY, Date.now().toString());
+      showToast('Pronostic ajouté !');
+      renderPronostics();
+    }).catch(() => showToast('Erreur lors de l’enregistrement'));
   });
 }
 
 function openEditPronostic(id) {
-  const p = DB.pronostics.find(x => x.id === id);
+  const p = remotePronostics.find(x => x.id === id);
   if (!p) return;
   openModal('Modifier le pronostic', pronosticFormHTML(p), () => {
     const selectVal = document.getElementById('f-participant').value;
@@ -419,11 +458,12 @@ function openEditPronostic(id) {
     if (!participant) { showToast('Le participant est requis'); return; }
     if (containsBannedWord(participant)) { showToast('Nom invalide — langage inapproprié'); return; }
     if (!coureur) { showToast('Le coureur choisi est requis'); return; }
-    Object.assign(p, { participant, coureur, temps });
-    DB.save();
     closeModal();
-    renderPronosticsList();
-    showToast('Pronostic modifié');
+    showToast('Enregistrement...');
+    SB.update('pronostics', id, { participant, coureur, temps }).then(() => {
+      showToast('Pronostic modifié !');
+      renderPronostics();
+    }).catch(() => showToast('Erreur lors de la modification'));
   });
 }
 
