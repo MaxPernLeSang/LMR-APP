@@ -210,14 +210,6 @@ function coureurFormHTML(c = {}) {
       <input class="form-input" id="f-nom" type="text" placeholder="Ex: Marcel Hirscher" value="${escHtml(c.nom || '')}" />
     </div>
     <div class="form-group">
-      <label class="form-label">Cote</label>
-      <input class="form-input" id="f-cote" type="number" step="0.01" placeholder="Ex: 100.00" value="${c.cote !== undefined ? c.cote : ''}" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Rang (classement interne)</label>
-      <input class="form-input" id="f-rang" type="number" step="0.01" placeholder="Ex: 1.00" value="${c.rang !== undefined ? c.rang : ''}" />
-    </div>
-    <div class="form-group">
       <label class="form-label">Statut</label>
       <select class="form-select" id="f-statut">
         <option value="active" ${(c.statut||'active')==='active'?'selected':''}>Actif</option>
@@ -246,12 +238,10 @@ function setupPhotoInput(existingPhoto) {
 function openAddCoureur() {
   openModal('Ajouter un coureur', coureurFormHTML(), () => {
     const nom = document.getElementById('f-nom').value.trim();
-    const cote = parseFloat(document.getElementById('f-cote').value);
-    const rang = parseFloat(document.getElementById('f-rang').value);
     const statut = document.getElementById('f-statut').value;
     const photoInput = document.getElementById('photo-input');
     if (!nom) { showToast('Le nom est requis'); return; }
-    const newC = { id: DB.nextId(DB.coureurs), nom, cote: isNaN(cote)?0:cote, rang: isNaN(rang)?0:rang, statut, photo: '' };
+    const newC = { id: DB.nextId(DB.coureurs), nom, cote: 0, rang: 0, statut, photo: '' };
     if (photoInput.files[0]) {
       const reader = new FileReader();
       reader.onload = ev => {
@@ -278,13 +268,11 @@ function openEditCoureur(id) {
   if (!c) return;
   openModal('Modifier le coureur', coureurFormHTML(c), () => {
     const nom = document.getElementById('f-nom').value.trim();
-    const cote = parseFloat(document.getElementById('f-cote').value);
-    const rang = parseFloat(document.getElementById('f-rang').value);
     const statut = document.getElementById('f-statut').value;
     const photoInput = document.getElementById('photo-input');
     if (!nom) { showToast('Le nom est requis'); return; }
     const doSave = (photo) => {
-      Object.assign(c, { nom, cote: isNaN(cote)?0:cote, rang: isNaN(rang)?0:rang, statut, photo });
+      Object.assign(c, { nom, statut, photo });
       DB.save();
       closeModal();
       renderRiderCards();

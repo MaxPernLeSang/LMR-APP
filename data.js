@@ -39,13 +39,13 @@ const DB = {
 
   _defaultCoureurs() {
     return [
-      { id: 1, nom: 'Marcel Hirscher', cote: 100, rang: 1, statut: 'active', photo: '' },
-      { id: 2, nom: 'Christina Geiger', cote: 90, rang: 2, statut: 'active', photo: '' },
-      { id: 3, nom: 'Maximilian Pichler', cote: 80, rang: 3, statut: 'active', photo: '' },
-      { id: 4, nom: 'Julia Ertl-Rubner', cote: 70, rang: 4, statut: 'active', photo: '' },
-      { id: 5, nom: 'Andreas Prommegger', cote: 60, rang: 5, statut: 'active', photo: '' },
-      { id: 6, nom: 'Michaela Schweizer', cote: 50, rang: 6, statut: 'inactive', photo: '' },
-      { id: 7, nom: 'Stefan Geisler', cote: 40, rang: 7, statut: 'active', photo: '' },
+      { id: 1, nom: 'Marcel Hirscher', statut: 'active', photo: '' },
+      { id: 2, nom: 'Christina Geiger', statut: 'active', photo: '' },
+      { id: 3, nom: 'Maximilian Pichler', statut: 'active', photo: '' },
+      { id: 4, nom: 'Julia Ertl-Rubner', statut: 'active', photo: '' },
+      { id: 5, nom: 'Andreas Prommegger', statut: 'active', photo: '' },
+      { id: 6, nom: 'Michaela Schweizer', statut: 'inactive', photo: '' },
+      { id: 7, nom: 'Stefan Geisler', statut: 'active', photo: '' },
     ];
   },
 
