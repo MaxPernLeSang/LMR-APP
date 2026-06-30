@@ -512,7 +512,11 @@
     <div class="admin-sidebar-logo">LMR</div>
     <div class="admin-sidebar-sub">Administration</div>
 
-    <button class="admin-nav-btn active" data-admin-page="classement">
+    <button class="admin-nav-btn active" data-admin-page="coureurs">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2"/><path d="M12 7c-2 0-4 1-5 3l-2 5h3l1 4h6l1-4h3l-2-5c-1-2-3-3-5-3z"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/></svg>
+      Coureurs
+    </button>
+    <button class="admin-nav-btn" data-admin-page="classement">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/></svg>
       Classement Coureurs
     </button>
@@ -542,8 +546,38 @@
   <!-- Main content -->
   <main class="admin-main">
 
+    <!-- PAGE: Coureurs -->
+    <div class="admin-page active" id="admin-page-coureurs">
+      <div class="admin-page-header">
+        <div>
+          <h1>Coureurs</h1>
+          <div class="page-subtitle">Gérer la liste des coureurs disponibles au vote</div>
+        </div>
+        <button class="btn-add" onclick="openAdminAddCoureur()">+ Ajouter</button>
+      </div>
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <span class="admin-section-title">Liste des coureurs</span>
+          <span id="admin-coureurs-count" style="font-size:13px;color:var(--text-muted)"></span>
+        </div>
+        <table class="classement-table">
+          <thead>
+            <tr>
+              <th>Photo</th>
+              <th>Nom</th>
+              <th>Cote</th>
+              <th>Rang</th>
+              <th>Statut</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-coureurs-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- PAGE: Classement Coureurs -->
-    <div class="admin-page active" id="admin-page-classement">
+    <div class="admin-page" id="admin-page-classement">
       <div class="admin-page-header">
         <div>
           <h1>Classement Coureurs</h1>
@@ -611,14 +645,17 @@
 
       <div class="admin-section">
         <div class="admin-section-header">
-          <span class="admin-section-title">Détail des pronostics</span>
+          <span class="admin-section-title">Détail de tous les pronostics</span>
+          <input type="text" id="votes-search" placeholder="Recherche..." style="background:var(--gray-input);border:none;border-radius:8px;padding:6px 12px;font-size:13px;outline:none;width:180px" oninput="filterVotesDetail(this.value)" />
         </div>
         <table class="classement-table">
           <thead>
             <tr>
+              <th>#</th>
               <th>Participant</th>
               <th>Coureur choisi</th>
               <th>Temps prévu</th>
+              <th style="text-align:right">Actions</th>
             </tr>
           </thead>
           <tbody id="votes-detail-tbody"></tbody>
@@ -713,6 +750,7 @@ function initAdmin() {
   document.querySelectorAll('[data-admin-page]').forEach(btn => {
     btn.addEventListener('click', () => navigateAdmin(btn.dataset.adminPage));
   });
+  renderAdminCoureurs();
   renderClassementPage();
   renderVotesPage();
   renderDashboard();
@@ -945,20 +983,50 @@ function renderVotesPage() {
       </div>`).join('');
   }
 
-  // Detail table
-  if (!DB.pronostics.length) {
-    detailTbody.innerHTML = `<tr><td colspan="3"><div class="admin-empty">
+  renderVotesDetail(DB.pronostics);
+}
+
+function filterVotesDetail(q) {
+  const filtered = DB.pronostics.filter(p =>
+    p.participant.toLowerCase().includes(q.toLowerCase()) ||
+    p.coureur.toLowerCase().includes(q.toLowerCase())
+  );
+  renderVotesDetail(filtered);
+}
+
+function renderVotesDetail(list) {
+  const detailTbody = document.getElementById('votes-detail-tbody');
+  if (!list.length) {
+    detailTbody.innerHTML = `<tr><td colspan="5"><div class="admin-empty">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
       <div class="admin-empty-title">Aucun pronostic enregistré</div>
     </div></td></tr>`;
   } else {
-    detailTbody.innerHTML = DB.pronostics.map(p => `
+    detailTbody.innerHTML = list.map((p, i) => `
       <tr>
-        <td class="td-name">${esc(p.participant)}</td>
+        <td style="color:var(--text-muted);font-size:13px;width:32px">${i+1}</td>
+        <td class="td-name" style="font-weight:700">${esc(p.participant)}</td>
         <td>${esc(p.coureur)}</td>
         <td style="color:var(--text-muted);font-size:13px">${esc(p.temps || '—')}</td>
+        <td style="text-align:right">
+          <button class="icon-btn delete" title="Supprimer" onclick="deletePronosticAdmin(${p.id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </td>
       </tr>`).join('');
   }
+}
+
+function deletePronosticAdmin(id) {
+  const p = DB.pronostics.find(x => x.id === id);
+  if (!p) return;
+  confirmDelete(`Supprimer le pronostic de "${p.participant}" ?`, () => {
+    DB.pronostics = DB.pronostics.filter(x => x.id !== id);
+    DB.save();
+    renderVotesPage();
+    renderDashboard();
+    showToast('Pronostic supprimé');
+  });
 }
 
 // ── PAGE: Dashboard ──
@@ -1008,6 +1076,77 @@ function renderDashboard() {
 
 function esc(str) {
   return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── PAGE: Coureurs Admin ──
+function renderAdminCoureurs() {
+  const tbody = document.getElementById('admin-coureurs-tbody');
+  const countEl = document.getElementById('admin-coureurs-count');
+  if (!tbody) return;
+  countEl.textContent = `${DB.coureurs.length} coureur${DB.coureurs.length !== 1 ? 's' : ''}`;
+  if (!DB.coureurs.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="admin-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="5" r="2"/><path d="M12 7c-2 0-4 1-5 3l-2 5h3l1 4h6l1-4h3l-2-5c-1-2-3-3-5-3z"/></svg>
+      <div class="admin-empty-title">Aucun coureur</div>
+      <div class="admin-empty-sub">Ajoutez des coureurs avec le bouton + Ajouter</div>
+    </div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = DB.coureurs.map(c => `
+    <tr>
+      <td>${c.photo ? `<img src="${esc(c.photo)}" style="width:40px;height:40px;object-fit:cover;border-radius:8px">` : '<div style="width:40px;height:40px;background:var(--gray-input);border-radius:8px"></div>'}</td>
+      <td class="td-name">${esc(c.nom)}</td>
+      <td><input class="inline-input" type="number" step="0.01" value="${c.cote||0}" style="width:80px" onchange="updateCoureurField(${c.id},'cote',parseFloat(this.value)||0)" /></td>
+      <td><input class="inline-input" type="number" step="0.01" value="${c.rang||0}" style="width:80px" onchange="updateCoureurField(${c.id},'rang',parseFloat(this.value)||0)" /></td>
+      <td>
+        <select style="background:var(--gray-input);border:none;border-radius:8px;padding:6px 8px;font-size:13px" onchange="updateCoureurField(${c.id},'statut',this.value)">
+          <option value="active" ${c.statut==='active'?'selected':''}>Actif</option>
+          <option value="inactive" ${c.statut!=='active'?'selected':''}>Inactif</option>
+        </select>
+      </td>
+      <td class="td-actions">
+        <button class="icon-btn delete" title="Supprimer" onclick="deleteAdminCoureur(${c.id})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </td>
+    </tr>`).join('');
+}
+
+function updateCoureurField(id, field, value) {
+  const c = DB.coureurs.find(x => x.id === id);
+  if (c) { c[field] = value; DB.save(); showToast('Mis à jour'); }
+}
+
+function deleteAdminCoureur(id) {
+  const c = DB.coureurs.find(x => x.id === id);
+  if (!c) return;
+  confirmDelete(`Supprimer "${c.nom}" ?`, () => {
+    DB.coureurs = DB.coureurs.filter(x => x.id !== id);
+    DB.save();
+    renderAdminCoureurs();
+    renderClassementPage();
+    renderDashboard();
+    showToast('Coureur supprimé');
+  });
+}
+
+function openAdminAddCoureur() {
+  const nom = prompt('Nom du coureur :');
+  if (!nom || !nom.trim()) return;
+  const cote = parseFloat(prompt('Cote (ex: 100) :') || '0');
+  const rang = parseFloat(prompt('Rang (ex: 1) :') || '0');
+  DB.coureurs.push({
+    id: DB.nextId(DB.coureurs),
+    nom: nom.trim(),
+    cote: isNaN(cote) ? 0 : cote,
+    rang: isNaN(rang) ? 0 : rang,
+    statut: 'active',
+    photo: ''
+  });
+  DB.save();
+  renderAdminCoureurs();
+  renderDashboard();
+  showToast('Coureur ajouté');
 }
 </script>
 </body>

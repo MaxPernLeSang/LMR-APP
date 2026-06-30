@@ -124,7 +124,6 @@ function renderCoureurs() {
         </button>
         <h1 class="page-title">Riders</h1>
       </div>
-      <button class="btn-add" onclick="openAddCoureur()">+ Add</button>
     </div>
     <div class="search-wrap">
       <div class="search-bar">
@@ -153,7 +152,7 @@ function renderRiderCards() {
     container.innerHTML = `<div class="empty-state">
       <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="5" r="2"/><path d="M12 7c-2 0-4 1-5 3l-2 5h3l1 4h6l1-4h3l-2-5c-1-2-3-3-5-3z"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/></svg></div>
       <div class="empty-state-text">Aucun coureur trouvé</div>
-      <div class="empty-state-sub">Ajoutez des coureurs avec le bouton + Add</div>
+      <div class="empty-state-sub">Aucun coureur n'a encore été ajouté.</div>
     </div>`;
     return;
   }
@@ -163,10 +162,6 @@ function renderRiderCards() {
       ${c.photo
         ? `<img class="rider-card-img" src="${escHtml(c.photo)}" alt="${escHtml(c.nom)}" />`
         : `<div class="rider-card-img-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><circle cx="12" cy="5" r="2"/><path d="M12 7c-2 0-4 1-5 3l-2 5h3l1 4h6l1-4h3l-2-5c-1-2-3-3-5-3z"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/></svg></div>`}
-      <div class="rider-card-actions">
-        <button class="card-action-btn" onclick="openEditCoureur(${c.id})" title="Modifier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-        <button class="card-action-btn" onclick="deleteCoureur(${c.id})" title="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
-      </div>
       <div class="rider-card-info">
         <div class="rider-card-cote">${parseFloat(c.cote).toFixed(2)}</div>
         <div class="rider-card-name">${escHtml(c.nom)}</div>
