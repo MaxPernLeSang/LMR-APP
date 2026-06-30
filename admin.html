@@ -724,6 +724,8 @@
 <script src="data.js"></script>
 <script src="config.js"></script>
 <script>
+let adminPronostics = [];
+
 // ── Password gate ──
 const ADMIN_PASSWORD = 'Larosiere';
 const SESSION_KEY = 'lmr_admin_auth';
@@ -785,8 +787,6 @@ function initAdmin() {
   renderVotesPage();
   renderDashboard();
 }
-
-let adminPronostics = [];
 
 function navigateAdmin(page) {
   document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
