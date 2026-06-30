@@ -1,4 +1,18 @@
 // ── Utility ──
+const BANNED_WORDS = [
+  'merde', 'putain', 'connard', 'connasse', 'salope', 'fdp', 'pd', 'bite',
+  'couille', 'cul', 'enculé', 'encule', 'batard', 'bâtard', 'nique', 'fuck',
+  'shit', 'bastard', 'con', 'chier', 'trou du cul', 'ta gueule', 'gueule'
+];
+
+function containsBannedWord(str) {
+  const lower = str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return BANNED_WORDS.some(w => {
+    const wn = w.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return lower.includes(wn);
+  });
+}
+
 function escHtml(str) {
   return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -387,6 +401,7 @@ function openAddPronostic() {
     const coureur = coureurEl ? coureurEl.value : '';
     const temps = document.getElementById('f-temps').value.trim();
     if (!participant) { showToast('Le participant est requis'); return; }
+    if (containsBannedWord(participant)) { showToast('Nom invalide — langage inapproprié'); return; }
     if (!coureur) { showToast('Le coureur choisi est requis'); return; }
     DB.pronostics.push({ id: DB.nextId(DB.pronostics), participant, coureur, temps });
     DB.save();
@@ -407,6 +422,7 @@ function openEditPronostic(id) {
     const coureur = coureurEl ? coureurEl.value : p.coureur;
     const temps = document.getElementById('f-temps').value.trim();
     if (!participant) { showToast('Le participant est requis'); return; }
+    if (containsBannedWord(participant)) { showToast('Nom invalide — langage inapproprié'); return; }
     if (!coureur) { showToast('Le coureur choisi est requis'); return; }
     Object.assign(p, { participant, coureur, temps });
     DB.save();
@@ -414,23 +430,6 @@ function openEditPronostic(id) {
     renderPronosticsList();
     showToast('Pronostic modifié');
   });
-  // Add delete button logic
-  const footer = document.querySelector('.modal-footer');
-  const delBtn = document.createElement('button');
-  delBtn.className = 'btn-cancel';
-  delBtn.style.background = '#fce4e4';
-  delBtn.style.color = '#e53935';
-  delBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>';
-  delBtn.onclick = () => {
-    closeModal();
-    confirmDelete(`Supprimer le pronostic de "${p.participant}" ?`, () => {
-      DB.pronostics = DB.pronostics.filter(x => x.id !== id);
-      DB.save();
-      renderPronosticsList();
-      showToast('Pronostic supprimé');
-    });
-  };
-  footer.insertBefore(delBtn, footer.firstChild);
 }
 
 // ─────────────────────────────────────────────
@@ -601,7 +600,6 @@ function renderClassementCoureurs() {
         </button>
         <h1 class="page-title">Coureurs</h1>
       </div>
-      <button class="btn-add" onclick="openAddClassementCoureur()">+ Add</button>
     </div>
     <div class="search-wrap">
       <div class="search-bar">
@@ -650,11 +648,7 @@ function renderCCList() {
         <div class="list-row-name">${escHtml(c.nom)}</div>
         <div class="list-row-sub">${parseFloat(c.score||0).toFixed(2)}</div>
       </div>
-      <div class="rank-number ${rankClass}" style="margin-left:auto;margin-right:8px">#${c.position||i+1}</div>
-      <div class="list-row-actions">
-        <button class="icon-btn" onclick="openEditClassementCoureur(${c.id})" title="Modifier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-        <button class="icon-btn delete" onclick="deleteClassementCoureur(${c.id})" title="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
-      </div>
+      <div class="rank-number ${rankClass}" style="margin-left:auto">#${c.position||i+1}</div>
     </div>`;
   }).join('');
 }
