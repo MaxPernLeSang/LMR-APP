@@ -545,19 +545,19 @@
 
     <button class="admin-nav-btn active" data-admin-page="coureurs">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2"/><path d="M12 7c-2 0-4 1-5 3l-2 5h3l1 4h6l1-4h3l-2-5c-1-2-3-3-5-3z"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/></svg>
-      Coureurs
+      <span>Coureurs</span>
     </button>
     <button class="admin-nav-btn" data-admin-page="classement">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/></svg>
-      Classement Coureurs
+      <span>Classement</span>
     </button>
     <button class="admin-nav-btn" data-admin-page="votes">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-      Votes / Pronostics
+      <span>Votes</span>
     </button>
     <button class="admin-nav-btn" data-admin-page="dashboard">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      Vue d'ensemble
+      <span>Dashboard</span>
     </button>
 
     <div class="admin-sidebar-spacer"></div>
@@ -793,6 +793,8 @@ function navigateAdmin(page) {
   document.querySelectorAll('[data-admin-page]').forEach(b => b.classList.remove('active'));
   document.getElementById(`admin-page-${page}`).classList.add('active');
   document.querySelector(`[data-admin-page="${page}"]`).classList.add('active');
+  if (page === 'votes') renderVotesPage();
+  if (page === 'dashboard') renderDashboard();
 }
 
 // ── Pending changes ──
