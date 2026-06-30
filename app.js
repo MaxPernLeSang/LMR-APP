@@ -163,7 +163,6 @@ function renderRiderCards() {
         ? `<img class="rider-card-img" src="${escHtml(c.photo)}" alt="${escHtml(c.nom)}" />`
         : `<div class="rider-card-img-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><circle cx="12" cy="5" r="2"/><path d="M12 7c-2 0-4 1-5 3l-2 5h3l1 4h6l1-4h3l-2-5c-1-2-3-3-5-3z"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/></svg></div>`}
       <div class="rider-card-info">
-        <div class="rider-card-cote">${parseFloat(c.cote).toFixed(2)}</div>
         <div class="rider-card-name">${escHtml(c.nom)}</div>
         <div class="rider-card-sub">${parseFloat(c.rang).toFixed(2)}</div>
       </div>
@@ -555,7 +554,7 @@ function renderPronoList() {
       <div class="rank-number ${rankClass}">${i+1}</div>
       <div class="ranking-info">
         <div class="ranking-name">${escHtml(s.nom)}</div>
-        <div class="ranking-sub">${s.total.toFixed(2)} · ${s.count.toFixed(2)}</div>
+        <div class="ranking-sub">${s.count} pronostic${s.count > 1 ? 's' : ''}</div>
       </div>
       <div class="list-row-chevron">›</div>
     </div>`;

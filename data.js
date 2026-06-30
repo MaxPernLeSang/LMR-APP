@@ -50,13 +50,7 @@ const DB = {
   },
 
   _defaultParticipants() {
-    return [
-      { id: 1, nom: 'Alexandre Dumoulin' },
-      { id: 2, nom: 'Jean-Marc Lavoix' },
-      { id: 3, nom: 'Marie-Jo Théolier' },
-      { id: 4, nom: 'Pierre Gobert' },
-      { id: 5, nom: 'Suzanne Dumoulin' },
-    ];
+    return [];
   },
 };
 
