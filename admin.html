@@ -992,8 +992,9 @@ function renderVotesPage() {
     DB.pronostics = data;
     _renderVotesSummary(data);
     renderVotesDetail(data);
-  }, () => {
-    showToast('Erreur chargement pronostics');
+  }, (err) => {
+    console.error('Erreur chargement pronostics:', err);
+    showToast('Erreur chargement pronostics: ' + (err?.message || err));
     _renderVotesSummary(DB.pronostics);
     renderVotesDetail(DB.pronostics);
   });
