@@ -402,12 +402,10 @@ body {
     flex-shrink: 0;
   }
   .sidebar-logo {
-    display: block !important;
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--pink);
-    padding: 0 20px 24px;
-    letter-spacing: -0.5px;
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px 24px;
   }
   .sidebar-admin-link-wrap {
     display: flex !important;
@@ -716,4 +714,36 @@ body {
   15% { opacity: 1; transform: translateX(-50%) translateY(0); }
   75% { opacity: 1; }
   100% { opacity: 0; }
+}
+
+/* ── Logos ── */
+.logo-lmr {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  background: #1a1a1a;
+  border-radius: 6px;
+  padding: 2px 4px;
+}
+.logo-larosiere {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+/* ── Mobile logo header ── */
+.mobile-logo-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 16px 6px;
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-border);
+  flex-shrink: 0;
+  order: 0;
+}
+@media (min-width: 960px) {
+  .mobile-logo-header { display: none; }
 }
