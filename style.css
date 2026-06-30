@@ -719,25 +719,39 @@ body {
 /* ── Tour Counter ── */
 .tour-counter {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 16px;
+  gap: 6px;
+  padding: 12px 16px 14px;
   background: var(--pink);
   flex-shrink: 0;
   order: 0;
 }
 .tour-counter-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.85);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.75);
 }
-.tour-counter-value {
-  font-size: 22px;
-  font-weight: 800;
+.tour-digits {
+  display: flex;
+  gap: 6px;
+}
+.tour-digit {
+  background: rgba(0,0,0,0.20);
   color: var(--white);
-  min-width: 32px;
-  text-align: center;
+  font-size: 36px;
+  font-weight: 800;
+  width: 52px;
+  height: 60px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── Logos ── */

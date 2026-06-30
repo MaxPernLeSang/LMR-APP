@@ -51,8 +51,11 @@ function computeTours() {
 }
 
 function updateTourCounter() {
-  const el = document.getElementById('tour-count');
-  if (el) el.textContent = computeTours();
+  const tours = computeTours();
+  const tens = document.getElementById('tour-digit-tens');
+  const ones = document.getElementById('tour-digit-ones');
+  if (tens) tens.textContent = Math.floor(tours / 10);
+  if (ones) ones.textContent = tours % 10;
 }
 
 updateTourCounter();
