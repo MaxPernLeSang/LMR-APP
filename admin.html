@@ -786,6 +786,8 @@ function initAdmin() {
   renderDashboard();
 }
 
+let adminPronostics = [];
+
 function navigateAdmin(page) {
   document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('[data-admin-page]').forEach(b => b.classList.remove('active'));
@@ -979,8 +981,6 @@ function addClassementRow() {
 }
 
 // ── PAGE: Votes ──
-let adminPronostics = [];
-
 function renderVotesPage() {
   const votesList = document.getElementById('votes-list');
   const totalLabel = document.getElementById('votes-total-label');
