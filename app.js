@@ -506,7 +506,6 @@ function renderClassementProno() {
         </button>
         <h1 class="page-title">Pronostiqueurs</h1>
       </div>
-      <button class="btn-add" onclick="openAddParticipant()">+ Add</button>
     </div>
     <div class="search-wrap">
       <div class="search-bar">
@@ -515,14 +514,14 @@ function renderClassementProno() {
       </div>
     </div>
     <div class="content">
-      <div id="prono-list"></div>
+      <div id="prono-list"><div class="empty-state"><div class="empty-state-sub" style="padding:40px">Chargement...</div></div></div>
     </div>`;
 
   document.getElementById('prono-search').addEventListener('input', e => {
     classementPronoSearch = e.target.value;
     renderPronoList();
   });
-  renderPronoList();
+  if (DB.pronostics.length) renderPronoList();
 }
 
 function renderPronoList() {
@@ -532,35 +531,16 @@ function renderPronoList() {
   const scores = computeClassementProno();
   const filtered = scores.filter(s => s.nom.toLowerCase().includes(q));
 
-  if (!DB.participants.length && !filtered.length) {
+  if (!filtered.length) {
     container.innerHTML = `<div class="empty-state">
       <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
       <div class="empty-state-text">Aucun pronostiqueur</div>
-      <div class="empty-state-sub">Ajoutez des participants et leurs pronostics</div>
+      <div class="empty-state-sub">Les pronostics apparaîtront ici</div>
     </div>`;
     return;
   }
 
-  // Show participants without pronostics too
-  const allParticipants = DB.participants
-    .filter(p => p.nom.toLowerCase().includes(q))
-    .map(p => {
-      const s = scores.find(x => x.nom === p.nom);
-      return s || { nom: p.nom, total: 0, count: 0, pronostics: [] };
-    });
-
-  // Merge with participants not in DB.participants
-  const inDB = new Set(DB.participants.map(p => p.nom));
-  const extra = filtered.filter(s => !inDB.has(s.nom));
-  const merged = [...allParticipants, ...extra].sort((a,b) => b.total - a.total);
-
-  if (!merged.length) {
-    container.innerHTML = `<div class="empty-state">
-      <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
-      <div class="empty-state-text">Aucun résultat</div>
-    </div>`;
-    return;
-  }
+  const merged = filtered.sort((a,b) => b.count - a.count);
 
   container.innerHTML = merged.map((s, i) => {
     const rankClass = i===0?'top1':i===1?'top2':i===2?'top3':'';
@@ -795,7 +775,8 @@ function deleteClassementCoureur(id) {
 SB.get('pronostics').then(data => {
   remotePronostics = data;
   DB.pronostics = data.map(p => ({ id: p.id, participant: p.participant, coureur: p.coureur, temps: p.temps || '' }));
-  if (currentPage === 'classement-prono') renderClassementProno();
+  if (currentPage === 'classement-prono') renderPronoList();
+  if (currentPage === 'pronostics') renderPronosticsList();
 }).catch(() => {
   remotePronostics = DB.pronostics;
 });
