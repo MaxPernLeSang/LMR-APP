@@ -55,3 +55,11 @@ const DB = {
 };
 
 DB.load();
+
+// Migration: clear old default participants
+if (!localStorage.getItem('lmr_migr_v1')) {
+  const defaults = ['Alexandre Dumoulin','Jean-Marc Lavoix','Marie-Jo Théolier','Pierre Gobert','Suzanne Dumoulin'];
+  DB.participants = DB.participants.filter(p => !defaults.includes(p.nom));
+  DB.save();
+  localStorage.setItem('lmr_migr_v1', '1');
+}
