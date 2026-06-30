@@ -342,7 +342,7 @@ html, body {
 
 /* ── Nav: mobile = bottom bar, desktop = sidebar ── */
 
-/* Mobile: bottom bar */
+/* ── Mobile: bottom tab bar ── */
 .bottom-nav {
   display: flex;
   flex-direction: row;
@@ -356,8 +356,10 @@ html, body {
   z-index: 100;
   padding: 0;
   width: 100%;
+  /* hide sidebar-only children */
 }
-.sidebar-logo { display: none; }
+.sidebar-logo { display: none !important; }
+.sidebar-admin-link-wrap { display: none !important; }
 .nav-btn {
   flex: 1;
   display: flex;
@@ -371,16 +373,16 @@ html, body {
   color: var(--text-muted);
   font-size: 10px;
   font-weight: 500;
-  padding: 6px 4px;
+  padding: 6px 2px;
   transition: color 0.15s;
   min-width: 0;
 }
-.nav-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
-.nav-btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.nav-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
+.nav-btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; font-size: 10px; }
 .nav-btn.active { color: var(--pink); }
 
-/* Desktop: sidebar */
-@media (min-width: 768px) {
+/* ── Desktop: sidebar (only on real large screens) ── */
+@media (min-width: 960px) {
   #app { flex-direction: row; }
   .toast { bottom: 24px; }
   .page { padding-bottom: 0; }
@@ -396,12 +398,21 @@ html, body {
     flex-shrink: 0;
   }
   .sidebar-logo {
-    display: block;
+    display: block !important;
     font-size: 22px;
     font-weight: 800;
     color: var(--pink);
     padding: 0 20px 24px;
     letter-spacing: -0.5px;
+  }
+  .sidebar-admin-link-wrap {
+    display: flex !important;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 12px 10px 0;
+    border-top: 1px solid var(--gray-border);
+    margin-top: 12px;
   }
   .nav-btn {
     flex-direction: row;
@@ -426,7 +437,7 @@ html, body {
   .list-row { padding: 14px 24px; }
   .ranking-row { padding: 14px 24px; }
   .modal-overlay { align-items: center; padding: 40px; }
-  .modal { border-radius: 16px; max-width: 520px; }
+  .modal { border-radius: 16px; max-width: 520px; animation: popIn 0.2s ease; }
 }
 
 /* ── Modal ── */
@@ -555,34 +566,21 @@ html, body {
 }
 .btn-upload:hover { background: var(--gray-border); }
 
-/* ── Sidebar admin link (desktop only) ── */
-.sidebar-admin-link-wrap { display: none; }
-@media (min-width: 768px) {
-  .sidebar-admin-link-wrap {
-    display: block;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 12px 10px 0;
-    border-top: 1px solid var(--gray-border);
-    margin-top: 12px;
-  }
-  .sidebar-admin-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px;
-    font-size: 13px;
-    color: var(--text-muted);
-    border-radius: 10px;
-    text-decoration: none;
-    transition: background 0.1s, color 0.1s;
-  }
-  .sidebar-admin-link:hover {
-    background: var(--gray-input);
-    color: var(--text-main);
-  }
+/* ── Sidebar admin link styles ── */
+.sidebar-admin-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.1s, color 0.1s;
+}
+.sidebar-admin-link:hover {
+  background: var(--gray-input);
+  color: var(--text-main);
 }
 
 /* ── Drawer (always hidden, nav replaces it) ── */
