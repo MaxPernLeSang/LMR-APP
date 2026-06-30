@@ -782,10 +782,17 @@ function initAdmin() {
   document.querySelectorAll('[data-admin-page]').forEach(btn => {
     btn.addEventListener('click', () => navigateAdmin(btn.dataset.adminPage));
   });
-  renderAdminCoureurs();
-  renderClassementPage();
+  SB.get('coureurs').then(data => {
+    DB.coureurs = data;
+    renderAdminCoureurs();
+    renderClassementPage();
+    renderDashboard();
+  }).catch(() => {
+    renderAdminCoureurs();
+    renderClassementPage();
+    renderDashboard();
+  });
   renderVotesPage();
-  renderDashboard();
 }
 
 function navigateAdmin(page) {
@@ -1174,55 +1181,60 @@ function eliminerCoureur(id) {
   const c = DB.coureurs.find(x => x.id === id);
   if (!c) return;
   confirmDelete(`Marquer "${c.nom}" comme éliminé maintenant ?`, () => {
-    c.eliminatedAt = new Date().toISOString();
-    c.statut = 'inactive';
-    DB.save();
-    renderAdminCoureurs();
-    showToast(`${c.nom} éliminé — Tour ${computeTourAt(new Date(c.eliminatedAt))}`);
+    const now = new Date().toISOString();
+    SB.update('coureurs', id, { eliminatedAt: now, statut: 'inactive' }).then(() => {
+      c.eliminatedAt = now;
+      c.statut = 'inactive';
+      renderAdminCoureurs();
+      showToast(`${c.nom} éliminé — Tour ${computeTourAt(new Date(now))}`);
+    }).catch(() => showToast('Erreur réseau'));
   });
 }
 
 function reinstaterCoureur(id) {
   const c = DB.coureurs.find(x => x.id === id);
   if (!c) return;
-  c.eliminatedAt = null;
-  c.statut = 'active';
-  DB.save();
-  renderAdminCoureurs();
-  showToast(`${c.nom} remis en course`);
+  SB.update('coureurs', id, { eliminatedAt: null, statut: 'active' }).then(() => {
+    c.eliminatedAt = null;
+    c.statut = 'active';
+    renderAdminCoureurs();
+    showToast(`${c.nom} remis en course`);
+  }).catch(() => showToast('Erreur réseau'));
 }
 
 function updateCoureurField(id, field, value) {
   const c = DB.coureurs.find(x => x.id === id);
-  if (c) { c[field] = value; DB.save(); showToast('Mis à jour'); }
+  if (!c) return;
+  SB.update('coureurs', id, { [field]: value }).then(() => {
+    c[field] = value;
+    showToast('Mis à jour');
+  }).catch(() => showToast('Erreur réseau'));
 }
 
 function deleteAdminCoureur(id) {
   const c = DB.coureurs.find(x => x.id === id);
   if (!c) return;
   confirmDelete(`Supprimer "${c.nom}" ?`, () => {
-    DB.coureurs = DB.coureurs.filter(x => x.id !== id);
-    DB.save();
-    renderAdminCoureurs();
-    renderClassementPage();
-    renderDashboard();
-    showToast('Coureur supprimé');
+    SB.delete('coureurs', id).then(() => {
+      DB.coureurs = DB.coureurs.filter(x => x.id !== id);
+      renderAdminCoureurs();
+      renderClassementPage();
+      renderDashboard();
+      showToast('Coureur supprimé');
+    }).catch(() => showToast('Erreur réseau'));
   });
 }
 
 function openAdminAddCoureur() {
   const nom = prompt('Nom du coureur :');
   if (!nom || !nom.trim()) return;
-  DB.coureurs.push({
-    id: DB.nextId(DB.coureurs),
-    nom: nom.trim(),
-    statut: 'active',
-    photo: ''
-  });
-  DB.save();
-  renderAdminCoureurs();
-  renderDashboard();
-  showToast('Coureur ajouté');
+  SB.insert('coureurs', { nom: nom.trim(), statut: 'active', photo: '' }).then(rows => {
+    const newC = rows[0];
+    DB.coureurs.push(newC);
+    renderAdminCoureurs();
+    renderDashboard();
+    showToast('Coureur ajouté');
+  }).catch(() => showToast('Erreur réseau'));
 }
 </script>
 </body>

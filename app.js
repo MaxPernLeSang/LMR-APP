@@ -778,13 +778,17 @@ function deleteClassementCoureur(id) {
 }
 
 // ── Init ──
-SB.get('pronostics').then(data => {
-  remotePronostics = data;
-  DB.pronostics = data.map(p => ({ id: p.id, participant: p.participant, coureur: p.coureur, temps: p.temps || '' }));
-  if (currentPage === 'classement-prono') renderPronoList();
+Promise.all([
+  SB.get('coureurs').catch(() => null),
+  SB.get('pronostics').catch(() => null)
+]).then(([coureurs, pronostics]) => {
+  if (coureurs) DB.coureurs = coureurs;
+  if (pronostics) {
+    remotePronostics = pronostics;
+    DB.pronostics = pronostics.map(p => ({ id: p.id, participant: p.participant, coureur: p.coureur, temps: p.temps || '' }));
+  }
+  if (currentPage === 'coureurs') renderRiderCards();
   if (currentPage === 'pronostics') renderPronosticsList();
-}).catch(() => {
-  remotePronostics = DB.pronostics;
 });
 
 navigate('coureurs');
