@@ -724,7 +724,7 @@ body {
   justify-content: center;
   gap: 8px;
   padding: 14px 16px 16px;
-  background: #1a1a1a;
+  background: var(--pink);
   flex-shrink: 0;
   order: 0;
 }
@@ -733,7 +733,7 @@ body {
   font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.75);
 }
 .tour-digits {
   display: flex;
