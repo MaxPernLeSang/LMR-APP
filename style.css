@@ -314,9 +314,33 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.prono-group {
+  margin-bottom: 12px;
+  background: var(--white);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.prono-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--gray-border);
+}
+.prono-group-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.prono-group-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
 .prono-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   padding: 12px 16px;
   border-bottom: 1px solid var(--gray-border);
   align-items: center;

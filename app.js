@@ -325,11 +325,6 @@ function renderPronostics() {
       </div>
     </div>
     <div class="content">
-      <div class="table-header" id="pronostics-table-header" style="display:none">
-        <span>PARTICIPANT</span>
-        <span>COUREUR CHOISI</span>
-        <span>TEMPS PRÉVU</span>
-      </div>
       <div id="pronostics-list"><div class="empty-state"><div class="empty-state-sub" style="padding:40px">Chargement...</div></div></div>
     </div>`;
 
@@ -358,9 +353,7 @@ function renderPronosticsList() {
     p.coureur.toLowerCase().includes(q)
   );
 
-  const header = document.getElementById('pronostics-table-header');
   if (!filtered.length) {
-    if (header) header.style.display = 'none';
     container.innerHTML = `<div class="empty-state">
       <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
       <div class="empty-state-text">Aucun pronostic</div>
@@ -368,13 +361,25 @@ function renderPronosticsList() {
     </div>`;
     return;
   }
-  if (header) header.style.display = 'grid';
 
-  container.innerHTML = filtered.map(p => `
-    <div class="prono-row" onclick="openEditPronostic('${escHtml(p.id)}')">
-      <div class="prono-cell bold">${escHtml(p.participant)}</div>
-      <div class="prono-cell">${escHtml(p.coureur)}</div>
-      <div class="prono-cell muted">${escHtml(p.temps || '')}</div>
+  // Group by participant
+  const groups = {};
+  filtered.forEach(p => {
+    if (!groups[p.participant]) groups[p.participant] = [];
+    groups[p.participant].push(p);
+  });
+
+  container.innerHTML = Object.entries(groups).map(([nom, pronos]) => `
+    <div class="prono-group">
+      <div class="prono-group-header">
+        <span class="prono-group-name">${escHtml(nom)}</span>
+        <span class="prono-group-count">${pronos.length} pronostic${pronos.length > 1 ? 's' : ''}</span>
+      </div>
+      ${pronos.map(p => `
+        <div class="prono-row" onclick="openEditPronostic('${escHtml(p.id)}')">
+          <div class="prono-cell">${escHtml(p.coureur)}</div>
+          <div class="prono-cell muted">${escHtml(p.temps || '')}</div>
+        </div>`).join('')}
     </div>`).join('');
 }
 
