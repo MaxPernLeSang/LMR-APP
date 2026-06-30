@@ -963,7 +963,7 @@ function renderVotesPage() {
     DB.pronostics = data;
     _renderVotesSummary(data);
     renderVotesDetail(data);
-  }).catch(() => {
+  }, () => {
     showToast('Erreur chargement pronostics');
     _renderVotesSummary(DB.pronostics);
     renderVotesDetail(DB.pronostics);
@@ -1006,6 +1006,7 @@ function filterVotesDetail(q) {
 
 function renderVotesDetail(list) {
   const detailTbody = document.getElementById('votes-detail-tbody');
+  if (!detailTbody) return;
   if (!list.length) {
     detailTbody.innerHTML = `<tr><td colspan="5"><div class="admin-empty">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
