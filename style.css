@@ -716,6 +716,30 @@ body {
   100% { opacity: 0; }
 }
 
+/* ── Tour Counter ── */
+.tour-counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--pink);
+  flex-shrink: 0;
+  order: 0;
+}
+.tour-counter-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+}
+.tour-counter-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--white);
+  min-width: 32px;
+  text-align: center;
+}
+
 /* ── Logos ── */
 .logo-lmr {
   height: 40px;

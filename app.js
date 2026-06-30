@@ -41,6 +41,23 @@ function confirmDelete(msg, onConfirm) {
   overlay.querySelector('.btn-confirm-delete').onclick = () => { overlay.remove(); onConfirm(); };
 }
 
+// ── Tour Counter ──
+function computeTours() {
+  const start = new Date('2026-07-04T10:00:00');
+  const now = new Date();
+  if (now < start) return 0;
+  const heures = Math.floor((now - start) / (1000 * 60 * 60));
+  return Math.min(heures + 1, 100);
+}
+
+function updateTourCounter() {
+  const el = document.getElementById('tour-count');
+  if (el) el.textContent = computeTours();
+}
+
+updateTourCounter();
+setInterval(updateTourCounter, 60 * 1000);
+
 // ── Navigation ──
 let currentPage = 'coureurs';
 const pages = document.querySelectorAll('.page');
